@@ -1,0 +1,6 @@
+nome,setor,receita_anual,lucro_liquido,divida_total,ativo_circulante,passivo_circulante,dias_atraso_12m,licenca_ambiental,gestao_residuos,energia_renovavel_pct,inventario_emissoes,certificacoes,pct_mulheres_lideranca
+Laticínios Serra Verde,Agroindústria,8500000,935000,2100000,1900000,1050000,0,True,True,60,True,2,40
+Transportes Rápido Sul,Logística,12000000,480000,7800000,2100000,2300000,18,True,False,0,False,0,10
+Restaurante Sabor da Terra,Alimentação,1800000,162000,350000,280000,190000,4,True,True,30,False,1,55
+Metalúrgica Alfenas,Indústria,22000000,1540000,9500000,5200000,3900000,7,True,True,15,True,1,20
+Café Montanha Orgânico,Agronegócio,4200000,588000,900000,1100000,520000,0,True,True,85,True,3,45
