@@ -2,6 +2,8 @@
 
 > Análise de crédito PJ que combina **saúde financeira** e **práticas ESG**, sugere uma **taxa bonificada** para empresas sustentáveis e entrega um **parecer de crédito pronto para o comitê**.
 
+### 🔗 [Abrir o app ao vivo](https://credito-verde-esg-lmjcrckkamk7gvujga8bcz.streamlit.app/)
+
 ## Problema de negócio
 
 Bancos e cooperativas querem expandir carteiras de crédito sustentável, mas a análise ESG ainda é manual, subjetiva e demorada. Na prática, o gerente PJ não tem um critério padronizado para dizer *quanto* uma boa prática ambiental deve valer na taxa.
