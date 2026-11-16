@@ -1,7 +1,6 @@
 # 🌱 Crédito Verde ESG
 
 > Análise de crédito PJ que combina **saúde financeira** e **práticas ESG**, sugere uma **taxa bonificada** para empresas sustentáveis e entrega um **parecer de crédito pronto para o comitê**.
-[LINK DO PROJETO](https://credito-verde-esg-lmjcrckkamk7gvujga8bcz.streamlit.app/)
 
 ## Problema de negócio
 

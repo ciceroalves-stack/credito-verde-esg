@@ -21,25 +21,55 @@ CNAE_SETOR = {
 SETOR_ALTO_IMPACTO = {"01", "02", "03", "05", "06", "07", "08", "10", "19", "20", "23", "24", "35", "38", "49"}
 
 
+def cnpj_valido(num: str) -> bool:
+    if len(num) != 14 or len(set(num)) == 1:
+        return False
+    def dv(base, pesos):
+        r = sum(int(a) * b for a, b in zip(base, pesos)) % 11
+        return "0" if r < 2 else str(11 - r)
+    p1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+    d1 = dv(num[:12], p1)
+    d2 = dv(num[:12] + d1, [6] + p1)
+    return num[12:] == d1 + d2
+
+
 def consultar_cnpj(cnpj: str) -> dict:
     num = re.sub(r"\D", "", cnpj)
-    if len(num) != 14:
-        raise ValueError("O CNPJ precisa ter 14 números.")
+    if not cnpj_valido(num):
+        raise ValueError("CNPJ inválido. Confira os números digitados.")
 
-    for url in (f"https://brasilapi.com.br/api/cnpj/v1/{num}",
-                f"https://publica.cnpj.ws/cnpj/{num}"):
+    fontes = (f"https://brasilapi.com.br/api/cnpj/v1/{num}",
+              f"https://publica.cnpj.ws/cnpj/{num}",
+              f"https://receitaws.com.br/v1/cnpj/{num}")
+    nao_achou = 0
+    for url in fontes:  # tenta todas: cada base pública às vezes falha ou está desatualizada
         try:
-            r = requests.get(url, timeout=12)
+            r = requests.get(url, timeout=12, headers={"User-Agent": "credito-verde-esg"})
             if r.status_code == 200:
-                return _normalizar(r.json(), num)
+                j = r.json()
+                if j.get("status") == "ERROR":  # receitaws responde 200 com erro
+                    nao_achou += 1
+                    continue
+                return _normalizar(j, num)
             if r.status_code == 404:
-                raise ValueError("CNPJ não encontrado na Receita Federal.")
-        except requests.RequestException:
+                nao_achou += 1
+        except (requests.RequestException, ValueError):
             continue
-    raise ConnectionError("Não foi possível consultar o CNPJ agora. Tente de novo em instantes.")
+    if nao_achou == len(fontes):
+        raise ValueError("CNPJ não encontrado na Receita Federal.")
+    raise ConnectionError("As bases públicas de CNPJ não responderam agora. Tente de novo em 1 minuto "
+                          "ou preencha o nome da empresa manualmente.")
 
 
 def _normalizar(j: dict, num: str) -> dict:
+    if "nome" in j and "atividade_principal" in j and isinstance(j["atividade_principal"], list):  # receitaws
+        ativ = (j["atividade_principal"] or [{}])[0]
+        return {
+            "cnpj": num, "razao_social": j.get("nome", ""), "nome_fantasia": j.get("fantasia") or "",
+            "cnae": re.sub(r"\D", "", ativ.get("code", "")).zfill(7), "cnae_descricao": ativ.get("text", ""),
+            "situacao": j.get("situacao", ""), "abertura": j.get("abertura", ""), "porte": j.get("porte", ""),
+            "municipio": j.get("municipio", ""), "uf": j.get("uf", ""),
+        }
     if "razao_social" in j and "estabelecimento" in j:  # formato cnpj.ws
         est = j["estabelecimento"]
         cnae = re.sub(r"\D", "", str(est.get("atividade_principal", {}).get("id", ""))).zfill(7)
